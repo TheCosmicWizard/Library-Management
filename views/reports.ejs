@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: #0056b3;
+        }
+
+        .report-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .report-section h2 {
+            color: #28a745;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .overdue {
+            background-color: #fff3cd;
+        }
+
+        .rank {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            min-width: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Library Reports</h1>
+        </div>
+
+        <div class="nav-links">
+            <a href="/admin">Main</a>
+            <a href="/admin/issued-books">Currently Issued Books</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/admin-logout" style="background: #dc3545;">Logout</a>
+        </div>
+
+        <!-- Books Not Yet Returned -->
+        <div class="report-section">
+            <h2>Books Not Yet Returned</h2>
+            <% if (notReturned.length> 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Student Name</th>
+                            <th>Issue Date</th>
+                            <th>Days Borrowed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% notReturned.forEach(function(book) { const issueDate=new Date(book.issue_date); const
+                            today=new Date(); const daysBorrowed=Math.floor((today - issueDate) / (1000 * 60 * 60 *
+                            24)); const isOverdue=daysBorrowed> 14; // Assuming 14 days is the limit
+                            %>
+                            <tr class="<%= isOverdue ? 'overdue' : '' %>">
+                                <td>
+                                    <%= book.title %>
+                                </td>
+                                <td>
+                                    <%= book.author %>
+                                </td>
+                                <td>
+                                    <%= book.student_name %>
+                                </td>
+                                <td>
+                                    <%= issueDate.toLocaleDateString() %>
+                                </td>
+                                <td>
+                                    <%= daysBorrowed %> days
+                                        <% if (isOverdue) { %>
+                                            <strong>(OVERDUE)</strong>
+                                            <% } %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+                <% } else { %>
+                    <div class="no-data">
+                        <p>All books have been returned!</p>
+                    </div>
+                    <% } %>
+        </div>
+
+        <!-- Top 3 Students -->
+        <div class="report-section">
+            <h2>Top 3 Students (Most Books Borrowed)</h2>
+            <% if (topStudents.length> 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Student Name</th>
+                            <th>Email</th>
+                            <th>Total Books Borrowed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% topStudents.forEach(function(student, index) { %>
+                            <tr>
+                                <td>
+                                    <span class="rank">
+                                        <%= index + 1 %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <%= student.name %>
+                                </td>
+                                <td>
+                                    <%= student.email %>
+                                </td>
+                                <td>
+                                    <%= student.book_count %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+                <% } else { %>
+                    <div class="no-data">
+                        <p>No student data available.</p>
+                    </div>
+                    <% } %>
+        </div>
+    </div>
+</body>
+
+</html>

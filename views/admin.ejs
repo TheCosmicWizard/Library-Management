@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: #0056b3;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #28a745;
+            margin-top: 0;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .issued {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Library Admin Panel</h1>
+            <p style="text-align: center; margin: 10px 0; color: #666;">
+                Logged in as: <strong style="color: #28a745;">
+                    <%= session.adminUsername || 'Admin' %>
+                </strong>
+            </p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/admin">Main</a>
+            <a href="/admin/issued-books">Currently Issued Books</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/admin-logout" style="background: #dc3545;">Logout</a>
+        </div>
+
+        <!-- Add New Book Section -->
+        <div class="section">
+            <h2>Add New Book</h2>
+            <form method="POST" action="/admin/add-book">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author:</label>
+                        <input type="text" id="author" name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="isbn">ISBN:</label>
+                        <input type="text" id="isbn" name="isbn" required>
+                    </div>
+                    <button type="submit">Add Book</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Issue Book Section -->
+        <div class="section">
+            <h2>Issue Book</h2>
+            <form method="POST" action="/admin/issue-book">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookId">Select Book:</label>
+                        <select id="bookId" name="bookId" required>
+                            <option value="">Select a book...</option>
+                            <% books.filter(book=> book.available === 1).forEach(function(book) { %>
+                                <option value="<%= book.id %>">
+                                    <%= book.title %> - <%= book.author %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentId">Select Student:</label>
+                        <select id="studentId" name="studentId" required>
+                            <option value="">Select a student...</option>
+                            <% students.forEach(function(student) { %>
+                                <option value="<%= student.id %>">
+                                    <%= student.name %> (<%= student.email %>)
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <button type="submit">Issue Book</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- All Books List -->
+        <div class="section">
+            <h2>All Books</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% books.forEach(function(book) { %>
+                        <tr>
+                            <td>
+                                <%= book.title %>
+                            </td>
+                            <td>
+                                <%= book.author %>
+                            </td>
+                            <td>
+                                <%= book.isbn %>
+                            </td>
+                            <td>
+                                <span class="status <%= book.available ? 'available' : 'issued' %>">
+                                    <%= book.available ? 'Available' : 'Issued' %>
+                                </span>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

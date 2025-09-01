@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currently Issued Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        button:hover {
+            background: #c82333;
+        }
+
+        .no-books {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Currently Issued Books</h1>
+        </div>
+
+        <div class="nav-links">
+            <a href="/admin">Main</a>
+            <a href="/admin/issued-books">Currently Issued Books</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/admin-logout" style="background: #dc3545;">Logout</a>
+        </div>
+
+        <% if (books.length> 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Student Name</th>
+                        <th>Issue Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% books.forEach(function(book) { %>
+                        <tr>
+                            <td>
+                                <%= book.title %>
+                            </td>
+                            <td>
+                                <%= book.author %>
+                            </td>
+                            <td>
+                                <%= book.student_name %>
+                            </td>
+                            <td>
+                                <%= new Date(book.issue_date).toLocaleDateString() %>
+                            </td>
+                            <td>
+                                <form method="POST" action="/admin/return-book" style="display: inline;">
+                                    <input type="hidden" name="logId" value="<%= book.log_id %>">
+                                    <button type="submit" onclick="return confirm('Mark this book as returned?')">
+                                        Return Book
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+            <% } else { %>
+                <div class="no-books">
+                    <p>No books are currently issued.</p>
+                </div>
+                <% } %>
+    </div>
+</body>
+
+</html>
