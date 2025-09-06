@@ -1,1 +1,5 @@
-node_modules
+# Node.js dependencies
+node_modules/
+
+# SQLite database file (auto-generated at runtime)
+library.db
